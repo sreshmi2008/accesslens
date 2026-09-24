@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "AccessLens - Accessibility Scanner",
+  "version": "0.1.0",
+  "description": "Scan the page you're on for accessibility barriers, right from your browser toolbar.",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab"],
+  "host_permissions": ["http://localhost:8000/*", "http://localhost:3000/*"]
+}
