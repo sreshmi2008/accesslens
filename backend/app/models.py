@@ -77,3 +77,11 @@ class ScanReport(BaseModel):
 
 class ScanRequest(BaseModel):
     url: str
+
+
+class ScanHistoryItem(BaseModel):
+    id: str
+    url: str
+    created_at: str
+    barriers_found: int
+    readiness_pct: int

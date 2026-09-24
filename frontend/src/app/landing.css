@@ -248,11 +248,13 @@
     }
 
     .nav-right {
-      gap: 22px;
+      gap: 30px;
     }
 
     .nav-links {
-      gap: 20px;
+      gap: 22px;
+      padding-right: 26px;
+      border-right: 1px solid rgba(148, 163, 184, 0.18);
     }
 
     .nav-links a,
@@ -272,7 +274,7 @@
 
     .auth-actions,
     .user-actions {
-      gap: 11px;
+      gap: 16px;
     }
 
     .mini-button {

@@ -2,13 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useAuth } from "@/lib/useAuth";
+import { useAuth } from "@/lib/AuthContext";
 import AuthModal from "@/components/AuthModal";
 import DashboardSidebar from "@/components/DashboardSidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, login, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [authMode, setAuthMode] = useState<"login" | "signup" | null>(null);
+
+  if (loading) {
+    return <div className="min-h-screen bg-slate-950" />;
+  }
 
   if (!user) {
     return (
@@ -34,14 +38,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Link href="/" className="text-xs text-slate-500 underline underline-offset-4 mt-2">Back to home</Link>
 
         {authMode && (
-          <AuthModal
-            mode={authMode}
-            onClose={() => setAuthMode(null)}
-            onSubmit={(email, password, name) => {
-              login(email, password, name);
-              setAuthMode(null);
-            }}
-          />
+          <AuthModal mode={authMode} onClose={() => setAuthMode(null)} onLoginSuccess={() => setAuthMode(null)} />
         )}
       </div>
     );

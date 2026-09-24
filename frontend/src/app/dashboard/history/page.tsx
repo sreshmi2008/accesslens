@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "@/lib/useAuth";
-import { useScanHistory } from "@/lib/useScanHistory";
+import { useAuth } from "@/lib/AuthContext";
+import { useReports } from "@/lib/useReports";
 import ScanHistoryCard from "@/components/ScanHistoryCard";
 
 export default function HistoryPage() {
-  const { user } = useAuth();
-  const { history } = useScanHistory(user?.email ?? null);
+  const { token } = useAuth();
+  const { reports } = useReports(token);
 
   return (
     <div className="space-y-6">
@@ -16,15 +16,15 @@ export default function HistoryPage() {
         <p className="text-sm text-slate-400 mt-1">Every scan you&rsquo;ve run, most recent first.</p>
       </div>
 
-      {history.length === 0 ? (
+      {reports.length === 0 ? (
         <p className="text-sm text-slate-500">
           No scans yet.{" "}
           <Link href="/dashboard/new-scan" className="text-cyan-300 underline underline-offset-4">Run your first one</Link>.
         </p>
       ) : (
         <div className="grid sm:grid-cols-2 gap-3">
-          {history.map((entry) => (
-            <ScanHistoryCard key={entry.reportId} entry={entry} />
+          {reports.map((entry) => (
+            <ScanHistoryCard key={entry.id} entry={entry} />
           ))}
         </div>
       )}

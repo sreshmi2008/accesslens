@@ -2,14 +2,13 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getReport, reportPdfUrl, startScan } from "@/lib/api";
+import { downloadReportPdf, getReport, startScan } from "@/lib/api";
 import type { Finding, JourneyResult, Persona, ScanReport } from "@/lib/types";
 import { PERSONA_LABEL } from "@/lib/types";
 import FindingCard from "@/components/FindingCard";
 import ScreenshotSimulator from "@/components/ScreenshotSimulator";
 import ScreenReaderDemo from "@/components/ScreenReaderDemo";
-import { useAuth } from "@/lib/useAuth";
-import { useScanHistory } from "@/lib/useScanHistory";
+import { useAuth } from "@/lib/AuthContext";
 
 const PERSONA_ORDER: Persona[] = ["screen_reader", "color_blind", "low_vision", "motor_impaired"];
 
@@ -61,15 +60,23 @@ function ResultsInner() {
   const params = useSearchParams();
   const url = params.get("url");
   const reportId = params.get("reportId");
-  const { user } = useAuth();
-  const { addEntry } = useScanHistory(user?.email ?? null);
+  const { token, loading: authLoading } = useAuth();
 
   const [report, setReport] = useState<ScanReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<TabId>("summary");
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setLoading(false);
+      setError("You need to be logged in to view this.");
+      return;
+    }
+
     let cancelled = false;
 
     async function run() {
@@ -77,10 +84,10 @@ function ResultsInner() {
       setError(null);
       try {
         if (reportId) {
-          const r = await getReport(reportId);
+          const r = await getReport(token!, reportId);
           if (!cancelled) setReport(r);
         } else if (url) {
-          const r = await startScan(url);
+          const r = await startScan(token!, url);
           if (!cancelled) {
             setReport(r);
             router.replace(`/dashboard/results?reportId=${r.id}`);
@@ -99,19 +106,17 @@ function ResultsInner() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, reportId]);
+  }, [url, reportId, token, authLoading]);
 
-  useEffect(() => {
-    if (!report || !user) return;
-    addEntry({
-      reportId: report.id,
-      url: report.url,
-      createdAt: report.created_at,
-      barriersFound: report.summary.barriers_found,
-      readinessPct: report.summary.is17802_readiness_pct,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [report, user]);
+  async function handleDownloadPdf() {
+    if (!token || !report) return;
+    setDownloading(true);
+    try {
+      await downloadReportPdf(token, report.id);
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -146,12 +151,13 @@ function ResultsInner() {
           <h1 className="text-xl font-bold text-slate-100 truncate max-w-lg">{report.url}</h1>
           <p className="text-xs text-slate-500 mt-1">Scanned {new Date(report.created_at).toLocaleString()}</p>
         </div>
-        <a
-          href={reportPdfUrl(report.id)}
-          className="text-xs font-semibold px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white whitespace-nowrap"
+        <button
+          onClick={handleDownloadPdf}
+          disabled={downloading}
+          className="text-xs font-semibold px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white whitespace-nowrap disabled:opacity-50"
         >
-          Download PDF Report
-        </a>
+          {downloading ? "Preparing PDF…" : "Download PDF Report"}
+        </button>
       </div>
 
       <div className="flex gap-1 border-b border-slate-800">

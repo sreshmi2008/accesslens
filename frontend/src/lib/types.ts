@@ -46,6 +46,14 @@ export interface ScanReport {
   screenshot_base64: string | null;
 }
 
+export interface ScanHistoryItem {
+  id: string;
+  url: string;
+  created_at: string;
+  barriers_found: number;
+  readiness_pct: number;
+}
+
 export const PERSONA_LABEL: Record<Persona, string> = {
   color_blind: "Color-blind user",
   low_vision: "Low-vision user",

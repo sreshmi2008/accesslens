@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import "./landing.css";
 import ThreeBackground from "@/components/ThreeBackground";
 import AuthModal from "@/components/AuthModal";
-import { useAuth } from "@/lib/useAuth";
+import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/lib/useToast";
 
 export default function LandingPage() {
   const router = useRouter();
-  const { user, login, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { message: toastMessage, showToast } = useToast();
 
   const [authMode, setAuthMode] = useState<"login" | "signup" | null>(null);
@@ -68,8 +68,7 @@ export default function LandingPage() {
     }
   }
 
-  function handleAuthSubmit(email: string, password: string, name?: string) {
-    login(email, password, name);
+  function handleLoginSuccess() {
     setAuthMode(null);
     router.push("/dashboard");
   }
@@ -446,7 +445,7 @@ export default function LandingPage() {
       </button>
 
       {authMode && (
-        <AuthModal mode={authMode} onClose={() => setAuthMode(null)} onSubmit={handleAuthSubmit} />
+        <AuthModal mode={authMode} onClose={() => setAuthMode(null)} onLoginSuccess={handleLoginSuccess} />
       )}
 
       <div className={`toast${toastMessage ? " show" : ""}`} role="status" aria-live="polite">

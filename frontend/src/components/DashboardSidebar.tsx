@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { DemoUser } from "@/lib/useAuth";
+import type { AuthUser } from "@/lib/api";
 
 const NAV_ITEMS = [
   {
@@ -34,7 +34,7 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function DashboardSidebar({ user, onLogout }: { user: DemoUser; onLogout: () => void }) {
+export default function DashboardSidebar({ user, onLogout }: { user: AuthUser; onLogout: () => void }) {
   const pathname = usePathname();
 
   return (

@@ -1,18 +1,28 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { useAuth } from "@/lib/AuthContext";
+import * as api from "@/lib/api";
+import type { AuthUser } from "@/lib/api";
 
 export default function AuthModal({
   mode,
   onClose,
-  onSubmit,
+  onLoginSuccess,
 }: {
   mode: "login" | "signup";
   onClose: () => void;
-  onSubmit: (email: string, password: string, name?: string) => void;
+  onLoginSuccess?: (user: AuthUser) => void;
 }) {
+  const { login } = useAuth();
   const [authMode, setAuthMode] = useState(mode);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [resendStatus, setResendStatus] = useState("");
+  const [signupDone, setSignupDone] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState("");
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
 
@@ -31,8 +41,10 @@ export default function AuthModal({
 
   const signup = authMode === "signup";
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError("");
+    setShowResend(false);
     const form = e.currentTarget;
     const email = (form.elements.namedItem("authEmail") as HTMLInputElement).value.trim();
     const password = (form.elements.namedItem("authPassword") as HTMLInputElement).value;
@@ -46,7 +58,35 @@ export default function AuthModal({
       setError("Please enter your name.");
       return;
     }
-    onSubmit(email, password, name);
+
+    setSubmitting(true);
+    try {
+      if (signup) {
+        await api.signup(email, password, name!);
+        setPendingEmail(email);
+        setSignupDone(true);
+      } else {
+        const user = await login(email, password);
+        onLoginSuccess?.(user);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong.";
+      setError(message);
+      if (message.toLowerCase().includes("verify")) setShowResend(true);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleResend() {
+    setResendStatus("Sending...");
+    try {
+      const emailValue = (document.getElementById("authEmail") as HTMLInputElement)?.value.trim();
+      const res = await api.resendVerification(emailValue || pendingEmail);
+      setResendStatus(res.message);
+    } catch {
+      setResendStatus("Could not resend right now. Try again shortly.");
+    }
   }
 
   return (
@@ -71,41 +111,87 @@ export default function AuthModal({
           </svg>
         </div>
 
-        <h2 id="authTitle">{signup ? "Create your account" : "Welcome back"}</h2>
-        <p className="modal-sub">
-          {signup ? "Create an account to save accessibility insights." : "Log in to save and review your accessibility insights."}
-        </p>
+        {signupDone ? (
+          <>
+            <h2 id="authTitle">Check your email</h2>
+            <p className="modal-sub">
+              We sent a verification link to <strong>{pendingEmail}</strong>. Click it, then come back and log in.
+            </p>
+            <button
+              className="button-primary auth-submit"
+              type="button"
+              onClick={() => {
+                setSignupDone(false);
+                setAuthMode("login");
+              }}
+            >
+              <span>Go to Login</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <h2 id="authTitle">{signup ? "Create your account" : "Welcome back"}</h2>
+            <p className="modal-sub">
+              {signup ? "Create an account to save your accessibility scans." : "Log in to see your scans and dashboard."}
+            </p>
 
-        <form onSubmit={handleSubmit}>
-          <div className={`field${signup ? "" : " hidden"}`}>
-            <label htmlFor="authName">Your name</label>
-            <input ref={nameRef} id="authName" name="authName" type="text" placeholder="Enter your name" />
-          </div>
+            <form onSubmit={handleSubmit}>
+              <div className={`field${signup ? "" : " hidden"}`}>
+                <label htmlFor="authName">Your name</label>
+                <input ref={nameRef} id="authName" name="authName" type="text" placeholder="Enter your name" />
+              </div>
 
-          <div className="field">
-            <label htmlFor="authEmail">Email address</label>
-            <input ref={emailRef} id="authEmail" name="authEmail" type="email" required placeholder="you@example.com" />
-          </div>
+              <div className="field">
+                <label htmlFor="authEmail">Email address</label>
+                <input ref={emailRef} id="authEmail" name="authEmail" type="email" required placeholder="you@example.com" />
+              </div>
 
-          <div className="field">
-            <label htmlFor="authPassword">Password</label>
-            <input id="authPassword" name="authPassword" type="password" required minLength={4} placeholder="Minimum 4 characters" />
-          </div>
+              <div className="field">
+                <label htmlFor="authPassword">Password</label>
+                <input
+                  id="authPassword"
+                  name="authPassword"
+                  type="password"
+                  required
+                  minLength={8}
+                  placeholder="Minimum 8 characters"
+                />
+              </div>
 
-          <p className="auth-error" role="alert">{error}</p>
+              <p className="auth-error" role="alert">{error}</p>
 
-          <button className="button-primary auth-submit" type="submit">
-            <span>{signup ? "Create Account" : "Login"}</span>
-          </button>
-        </form>
+              {showResend && (
+                <div style={{ marginBottom: 14 }}>
+                  <button type="button" onClick={handleResend} className="switch-auth" style={{ margin: 0 }}>
+                    <span style={{ textDecoration: "underline", cursor: "pointer", color: "#67e8f9" }}>
+                      Resend verification email
+                    </span>
+                  </button>
+                  {resendStatus && <p className="modal-note" style={{ marginTop: 6 }}>{resendStatus}</p>}
+                </div>
+              )}
 
-        <p className="switch-auth">
-          <span>{signup ? "Already have an account?" : "New to AccessLens?"}</span>{" "}
-          <button type="button" onClick={() => { setAuthMode(signup ? "login" : "signup"); setError(""); }}>
-            {signup ? "Login instead" : "Create an account"}
-          </button>
-        </p>
-        <p className="modal-note">Hackathon demo authentication only. Do not enter a real password.</p>
+              <button className="button-primary auth-submit" type="submit" disabled={submitting}>
+                <span>{submitting ? "Please wait…" : signup ? "Create Account" : "Login"}</span>
+              </button>
+            </form>
+
+            {!signup && (
+              <p className="modal-note" style={{ marginTop: 12 }}>
+                <Link href="/forgot-password" style={{ color: "#67e8f9", textDecoration: "underline" }} onClick={onClose}>
+                  Forgot your password?
+                </Link>
+              </p>
+            )}
+
+            <p className="switch-auth">
+              <span>{signup ? "Already have an account?" : "New to AccessLens?"}</span>{" "}
+              <button type="button" onClick={() => { setAuthMode(signup ? "login" : "signup"); setError(""); setShowResend(false); }}>
+                {signup ? "Login instead" : "Create an account"}
+              </button>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
