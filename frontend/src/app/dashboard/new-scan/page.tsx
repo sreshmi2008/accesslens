@@ -2,6 +2,7 @@
 
 import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const DEMOS: Record<string, { label: string; url: string }> = {
   ecommerce: { label: "E-commerce Signup", url: "https://www.w3.org/WAI/demos/bad/before/home.html" },
@@ -86,6 +87,22 @@ export default function NewScanPage() {
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="rounded-xl border p-4 flex items-center justify-between gap-4 flex-wrap" style={{ borderColor: "var(--border)", background: "var(--accent-soft)" }}>
+        <div>
+          <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>Want AI to actually click through the site?</p>
+          <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+            AI Journeys let Claude sign up, fill forms, and navigate like a real visitor, checking accessibility at every step.
+          </p>
+        </div>
+        <Link
+          href="/dashboard/ai-journey"
+          className="text-xs font-bold px-4 py-2 rounded-full text-white whitespace-nowrap"
+          style={{ background: "var(--accent-strong)" }}
+        >
+          Try AI Journeys
+        </Link>
       </div>
     </div>
   );

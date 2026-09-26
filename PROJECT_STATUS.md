@@ -1,6 +1,6 @@
 # AccessLens — Project Status & Roadmap
 
-_Last updated: 26 September 2026_
+_Last updated: 26 September 2026 (evening)_
 
 This file exists so anyone picking this project up doesn't have to re-derive what's done, what's
 missing, and what to do next. If you're new here, read `GETTING_STARTED.md` first to get the app
@@ -29,10 +29,11 @@ to automate the easy ~30-40% of issues and clearly guide humans on the rest.
 | PDF report download | ✅ Done | No |
 | Real user accounts (signup/login/email verify/password reset) | ✅ Done | No (needs Resend key for real email delivery) |
 | Scan history dashboard (Overview / New Scan / History / Results tabs) | ✅ Done | No |
-| **True multi-step journeys** (actually complete a signup, search+filter, checkout) | ❌ Not built | No — separate work regardless of the key |
+| **AI-driven journeys** (Claude actually clicks/types through signup, forms, checkout like a real user, using Anthropic's Computer Use) | ✅ Code complete, unverified — needs a Claude key with Computer Use access to test for real; see below | **Yes — no fallback exists for this one** |
 | Specific per-finding manual-test instructions (e.g. "test this with NVDA") | ✅ Done — every finding now shows a "Manual test:" hint, tested end-to-end | No (works via the fallback table without a key; gets more specific per-element with one) |
 | Chrome extension | ✅ Fixed — now has its own login form, stores a token, sends it on scans. Tested end-to-end in real Chromium (login → authenticated scan → opens results). | No |
 | **Database migration to Supabase (hosted Postgres)** | ✅ Done — live and verified. Data survives a full backend restart (tested). | No |
+| Light/dark theme + minimal single-accent redesign | ✅ Done — dashboard, login popup, all themed and verified in both modes | No |
 | Hosting / public URL | ❌ Not started | No |
 | Automated tests | ❌ None — everything verified by hand so far | No |
 
@@ -62,20 +63,28 @@ to automate the easy ~30-40% of issues and clearly guide humans on the rest.
    note below for why). Verified: signup, login, scanning, and history all work against it, and
    data survives a full backend restart.
 
-5. **Build real multi-step journey simulation.**
-   Currently, "journeys" are just "is this element inside a `<form>` tag or not" — see
-   `backend/app/scanner/browser.py`. To actually simulate a signup/login/checkout flow, the
-   scanner would need to identify and interact with real UI (fill fields, click submit, follow
-   redirects) using Playwright's `fill()`/`click()` methods, per named flow. This is the biggest
-   remaining piece of engineering work and should probably be scoped as its own task rather than
-   bolted on quickly — it needs a plan for how to detect "this is a signup form" vs "this is a
-   search box" reliably across arbitrary sites.
+5. ~~Build real multi-step journey simulation.~~ **Code complete, needs a real key to verify.**
+   Built as "AI-driven journeys" (`backend/app/ai_journey/`): Claude uses Anthropic's Computer Use
+   tool (`computer_toolset_20260801`) to actually click, type, and navigate a real Playwright
+   browser step by step — a real person's worth of interaction, not a guessed heuristic. Safety
+   guardrails baked in: capped at 12 steps, a fixed set of fake test data for any form fields
+   (never real personal info), a same-domain guard that stops the journey if a click navigates to
+   a different site, and an explicit system-prompt rule to never complete a real payment or
+   destructive action. New endpoints (`POST /api/ai-journey`, `GET /api/ai-journeys`,
+   `GET /api/ai-journey/{id}`), a new `ai_journeys` DB table, and a full frontend flow
+   (`/dashboard/ai-journey` to start one + view history, `/dashboard/ai-journey/results` for the
+   step-by-step viewer with screenshots and per-step findings). **Verified as far as possible
+   without a real key**: the whole pipeline (frontend → backend → engine → first Claude call)
+   works correctly and surfaces a clear error on an invalid/placeholder key instead of silently
+   saving an empty "success" — but the actual click/type decisions have never been tested against
+   a real site, since that requires a working key. Test this **first** once the key is in, before
+   trusting it on anything important — it's the least-proven piece of the whole app.
 
 6. **Deploy it so it has a public link.**
    See `GETTING_STARTED.md` Section 14 for the beginner-level overview (Vercel for the frontend,
-   Render/Railway/Fly.io for the backend). With Supabase already handling the database (once step 4
-   above is done), this step is just about hosting the frontend and backend themselves. Nothing has
-   been set up yet — this is a from-scratch task.
+   Render/Railway/Fly.io for the backend). With Supabase already handling the database, this step
+   is just about hosting the frontend and backend themselves. Nothing has been set up yet — this
+   is a from-scratch task.
 
 7. **Add automated tests.**
    None exist yet. Backend: `pytest` against the FastAPI endpoints (auth flow, scan persistence).
@@ -128,7 +137,10 @@ to automate the easy ~30-40% of issues and clearly guide humans on the rest.
 ## Where things live (quick map)
 
 - Scanning logic: `backend/app/scanner/browser.py`
+- AI-driven journeys (Computer Use loop): `backend/app/ai_journey/` (`engine.py` = the action loop,
+  `actions.py` = mapping Claude's actions to real Playwright calls, `prompts.py` = the safety rules)
 - AI narration: `backend/app/ai/claude_client.py`
+- Theme system: `frontend/src/lib/ThemeContext.tsx` + tokens in `frontend/src/app/globals.css`
 - Compliance law mapping: `backend/app/compliance/mapping.py`
 - Auth (signup/login/verify/reset): `backend/app/auth/`
 - Email sending: `backend/app/email/`

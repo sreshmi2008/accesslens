@@ -31,6 +31,7 @@ class User(Base):
 
     scans = relationship("ScanRecord", back_populates="user", cascade="all, delete-orphan")
     tokens = relationship("EmailToken", back_populates="user", cascade="all, delete-orphan")
+    ai_journeys = relationship("AIJourneyRecord", back_populates="user", cascade="all, delete-orphan")
 
 
 class EmailToken(Base):
@@ -58,3 +59,19 @@ class ScanRecord(Base):
     report_json = Column(JSON, nullable=False)
 
     user = relationship("User", back_populates="scans")
+
+
+class AIJourneyRecord(Base):
+    __tablename__ = "ai_journeys"
+
+    id = Column(String, primary_key=True)  # same id as the AIJourneyReport it stores
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    url = Column(String, nullable=False)
+    goal = Column(String, nullable=True)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    barriers_found = Column(Integer, default=0, nullable=False)
+    steps_taken = Column(Integer, default=0, nullable=False)
+    stop_reason = Column(String, nullable=False)
+    report_json = Column(JSON, nullable=False)
+
+    user = relationship("User", back_populates="ai_journeys")

@@ -69,6 +69,50 @@ def _journey_for(in_form: bool) -> str:
     return "Form Interaction Journey" if in_form else "Page Load Journey"
 
 
+async def run_axe_on_page(page, journey_name: str | None = None) -> list[RawFinding]:
+    """Run axe-core against the page's current state and return raw findings.
+
+    Shared by the deterministic single-page scanner and the AI-driven journey
+    engine, which calls this after every action to check accessibility at
+    each step instead of only once at the end.
+    """
+    findings: list[RawFinding] = []
+    await page.evaluate(AXE_SOURCE)
+    axe_results = await page.evaluate("async () => await axe.run()")
+
+    selectors = []
+    violations = axe_results.get("violations", [])
+    for v in violations:
+        for node in v.get("nodes", []):
+            target = node.get("target", ["body"])
+            selectors.append(target[0] if target else "body")
+
+    in_form_flags = await page.evaluate(FORM_MEMBERSHIP_JS, selectors) if selectors else []
+
+    idx = 0
+    for v in violations:
+        wcag_ref = extract_wcag_ref(v.get("tags", []))
+        severity = AXE_IMPACT_TO_SEVERITY.get(v.get("impact") or "moderate", Severity.moderate)
+        for node in v.get("nodes", []):
+            target = node.get("target", ["body"])
+            selector = target[0] if target else "body"
+            in_form = in_form_flags[idx] if idx < len(in_form_flags) else False
+            idx += 1
+            findings.append(
+                RawFinding(
+                    source="axe",
+                    rule_id=v.get("id", "unknown"),
+                    wcag_ref=wcag_ref,
+                    selector=selector,
+                    html_snippet=node.get("html", "")[:400],
+                    description=f"{v.get('help', '')}. {node.get('failureSummary', '')}".strip(),
+                    journey=journey_name or _journey_for(in_form),
+                    severity_hint=severity,
+                )
+            )
+    return findings
+
+
 class ScanResult:
     def __init__(self):
         self.raw_findings: list[RawFinding] = []
@@ -100,39 +144,7 @@ async def run_scan(url: str) -> ScanResult:
         result.has_form = await page.evaluate("() => document.querySelectorAll('form').length > 0")
 
         # 1. axe-core: the rule-based ~30-40% (alt text, contrast, labels, ARIA, roles)
-        await page.evaluate(AXE_SOURCE)
-        axe_results = await page.evaluate("async () => await axe.run()")
-
-        selectors = []
-        violations = axe_results.get("violations", [])
-        for v in violations:
-            for node in v.get("nodes", []):
-                target = node.get("target", ["body"])
-                selectors.append(target[0] if target else "body")
-
-        in_form_flags = await page.evaluate(FORM_MEMBERSHIP_JS, selectors) if selectors else []
-
-        idx = 0
-        for v in violations:
-            wcag_ref = extract_wcag_ref(v.get("tags", []))
-            severity = AXE_IMPACT_TO_SEVERITY.get(v.get("impact") or "moderate", Severity.moderate)
-            for node in v.get("nodes", []):
-                target = node.get("target", ["body"])
-                selector = target[0] if target else "body"
-                in_form = in_form_flags[idx] if idx < len(in_form_flags) else False
-                idx += 1
-                result.raw_findings.append(
-                    RawFinding(
-                        source="axe",
-                        rule_id=v.get("id", "unknown"),
-                        wcag_ref=wcag_ref,
-                        selector=selector,
-                        html_snippet=node.get("html", "")[:400],
-                        description=f"{v.get('help', '')}. {node.get('failureSummary', '')}".strip(),
-                        journey=_journey_for(in_form),
-                        severity_hint=severity,
-                    )
-                )
+        result.raw_findings.extend(await run_axe_on_page(page))
 
         # 2. Motor-impaired heuristics: touch target size and crowding
         elements = await page.evaluate(INTERACTIVE_ELEMENTS_JS)

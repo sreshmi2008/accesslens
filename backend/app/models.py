@@ -86,3 +86,45 @@ class ScanHistoryItem(BaseModel):
     created_at: str
     barriers_found: int
     readiness_pct: int
+
+
+class JourneyAction(BaseModel):
+    """One computer-use action Claude took (e.g. left_click, type) — kept for
+    transparency so a human reviewing the journey can see exactly what the
+    AI did at each step, not just the outcome."""
+
+    name: str
+    input: dict
+
+
+class AIJourneyStep(BaseModel):
+    step_number: int
+    url: str
+    actions: list[JourneyAction]
+    screenshot_base64: Optional[str] = None
+    findings: list[Finding] = Field(default_factory=list)
+
+
+class AIJourneyReport(BaseModel):
+    id: str
+    url: str
+    goal: Optional[str] = None
+    created_at: str
+    steps: list[AIJourneyStep]
+    summary: ScanSummary
+    stop_reason: str  # "completed" | "max_steps_reached" | "left_target_site" | "error"
+
+
+class AIJourneyRequest(BaseModel):
+    url: str
+    goal: Optional[str] = None
+
+
+class AIJourneyHistoryItem(BaseModel):
+    id: str
+    url: str
+    goal: Optional[str] = None
+    created_at: str
+    barriers_found: int
+    steps_taken: int
+    stop_reason: str

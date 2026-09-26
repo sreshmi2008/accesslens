@@ -1,4 +1,4 @@
-import type { ScanHistoryItem, ScanReport } from "./types";
+import type { AIJourneyHistoryItem, AIJourneyReport, ScanHistoryItem, ScanReport } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -127,4 +127,25 @@ export async function downloadReportPdf(token: string, reportId: string): Promis
   link.download = `accesslens-report-${reportId.slice(0, 8)}.pdf`;
   link.click();
   URL.revokeObjectURL(url);
+}
+
+// --- AI-driven journeys ---
+
+export async function startAiJourney(token: string, url: string, goal: string | null): Promise<AIJourneyReport> {
+  const res = await fetch(`${API_BASE}/api/ai-journey`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeaders(token) },
+    body: JSON.stringify({ url, goal }),
+  });
+  return parseOrThrow(res);
+}
+
+export async function getAiJourney(token: string, journeyId: string): Promise<AIJourneyReport> {
+  const res = await fetch(`${API_BASE}/api/ai-journey/${journeyId}`, { headers: authHeaders(token) });
+  return parseOrThrow(res);
+}
+
+export async function getAiJourneys(token: string): Promise<AIJourneyHistoryItem[]> {
+  const res = await fetch(`${API_BASE}/api/ai-journeys`, { headers: authHeaders(token) });
+  return parseOrThrow(res);
 }

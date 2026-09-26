@@ -55,6 +55,41 @@ export interface ScanHistoryItem {
   readiness_pct: number;
 }
 
+export interface JourneyAction {
+  name: string;
+  input: Record<string, unknown>;
+}
+
+export interface AIJourneyStep {
+  step_number: number;
+  url: string;
+  actions: JourneyAction[];
+  screenshot_base64: string | null;
+  findings: Finding[];
+}
+
+export type AIJourneyStopReason = "completed" | "max_steps_reached" | "left_target_site" | "error";
+
+export interface AIJourneyReport {
+  id: string;
+  url: string;
+  goal: string | null;
+  created_at: string;
+  steps: AIJourneyStep[];
+  summary: ScanSummary;
+  stop_reason: AIJourneyStopReason;
+}
+
+export interface AIJourneyHistoryItem {
+  id: string;
+  url: string;
+  goal: string | null;
+  created_at: string;
+  barriers_found: number;
+  steps_taken: number;
+  stop_reason: AIJourneyStopReason;
+}
+
 export const PERSONA_LABEL: Record<Persona, string> = {
   color_blind: "Color-blind user",
   low_vision: "Low-vision user",
