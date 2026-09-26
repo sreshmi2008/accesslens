@@ -1,8 +1,45 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   DESIGN TOKENS - dashboard/app surfaces
+   One confident accent (indigo) instead of the landing page's
+   cyan/blue/purple/pink mix, kept intentionally restrained.
+   Toggled via [data-theme] on <html>; see lib/ThemeContext.tsx.
+============================================================ */
+
+:root,
+:root[data-theme="dark"] {
+  --background: #09090b;
+  --surface: #0f0f12;
+  --surface-raised: #17171b;
+  --surface-hover: #1e1e23;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --text-faint: #71717a;
+  --accent: #818cf8;
+  --accent-strong: #6366f1;
+  --accent-soft: rgba(129, 140, 248, 0.14);
+  --accent-contrast: #ffffff;
+  --foreground: var(--text);
+}
+
+:root[data-theme="light"] {
+  --background: #fafafa;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-hover: #f4f4f5;
+  --border: #e4e4e7;
+  --border-strong: #d4d4d8;
+  --text: #18181b;
+  --text-muted: #52525b;
+  --text-faint: #71717a;
+  --accent: #4f46e5;
+  --accent-strong: #4338ca;
+  --accent-soft: rgba(79, 70, 229, 0.08);
+  --accent-contrast: #ffffff;
+  --foreground: var(--text);
 }
 
 @theme inline {
@@ -12,15 +49,197 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ============================================================
+   SHARED BUTTONS + AUTH MODAL
+   Used by AuthModal, which appears both on the landing page and
+   inside the dashboard's login gate — must load on every route,
+   so these live here rather than in landing.css (homepage-only).
+============================================================ */
+
+.button-primary {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  color: var(--accent-contrast);
+  background: var(--accent-strong);
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.22);
+  transition:
+    transform 0.2s cubic-bezier(.2,.8,.2,1),
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.button-primary:hover {
+  transform: translateY(-2px);
+  background: var(--accent);
+  box-shadow: 0 16px 32px rgba(79, 70, 229, 0.3);
+}
+
+.button-primary span {
+  position: relative;
+  z-index: 2;
+}
+
+.button-outline {
+  border: 1px solid var(--accent);
+  border-radius: 13px;
+  padding: 10px 15px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.button-outline:hover {
+  transform: translateY(-1px);
+  background: var(--accent-soft);
+  filter: brightness(1.1);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.modal-panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 440px);
+  padding: 31px;
+  border: 1px solid var(--border-strong);
+  border-radius: 24px;
+  background: var(--surface-raised);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  font-family: var(--font-inter), sans-serif;
+}
+
+.close-modal {
+  position: absolute;
+  top: 17px;
+  right: 17px;
+  display: grid;
+  width: 35px;
+  height: 35px;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.close-modal:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
+.modal-logo {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  background: var(--accent-strong);
+}
+
+.modal-panel h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 1.72rem;
+  color: var(--text);
+}
+
+.modal-sub {
+  margin: 0 0 23px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.56;
+}
+
+.field {
+  margin-bottom: 15px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--text);
+  font-size: 0.81rem;
+  font-weight: 600;
+}
+
+.field input {
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  border-radius: 13px;
+  padding: 13px 14px;
+  color: var(--text);
+  outline: none;
+  background: var(--background);
+}
+
+.field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.auth-error {
+  min-height: 20px;
+  margin: 2px 0 10px;
+  color: #fb7185;
+  font-size: 0.8rem;
+}
+
+.auth-submit {
+  width: 100%;
+  min-height: 50px;
+  font-weight: 800;
+}
+
+.switch-auth {
+  margin: 20px 0 0;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: 0.83rem;
+}
+
+.switch-auth button {
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  background: transparent;
+  font-weight: 800;
+}
+
+.modal-note {
+  margin: 15px 0 0;
+  color: var(--text-faint);
+  text-align: center;
+  font-size: 0.7rem;
 }

@@ -21,9 +21,9 @@ type TabId = (typeof TABS)[number]["id"];
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 text-center">
-      <div className="text-2xl font-bold text-slate-100">{value}</div>
-      <div className="text-xs text-slate-400 mt-1">{label}</div>
+    <div className="rounded-xl border p-4 text-center" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+      <div className="text-2xl font-bold" style={{ color: "var(--text)" }}>{value}</div>
+      <div className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>{label}</div>
     </div>
   );
 }
@@ -37,13 +37,13 @@ function JourneyBlock({ journey }: { journey: JourneyResult }) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-slate-100">{journey.name}</h3>
+      <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>{journey.name}</h3>
       {journey.findings.length === 0 && (
-        <p className="text-sm text-slate-400">No barriers found in this journey.</p>
+        <p className="text-sm" style={{ color: "var(--text-muted)" }}>No barriers found in this journey.</p>
       )}
       {PERSONA_ORDER.filter((p) => byPersona.has(p)).map((persona) => (
         <div key={persona} className="space-y-2">
-          <h4 className="text-xs font-bold uppercase tracking-wide text-cyan-300">{PERSONA_LABEL[persona]}</h4>
+          <h4 className="text-xs font-bold uppercase tracking-wide" style={{ color: "var(--accent)" }}>{PERSONA_LABEL[persona]}</h4>
           <div className="space-y-2">
             {byPersona.get(persona)!.map((f) => (
               <FindingCard key={f.id} finding={f} />
@@ -121,8 +121,11 @@ function ResultsInner() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-        <div className="h-10 w-10 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
-        <p className="text-slate-400 text-sm max-w-md">
+        <div
+          className="h-10 w-10 rounded-full border-2 border-t-transparent animate-spin"
+          style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }}
+        />
+        <p className="text-sm max-w-md" style={{ color: "var(--text-muted)" }}>
           Simulating disabled-user journeys on {url || "this site"}&hellip; this drives a real headless
           browser through the page, so it can take up to a minute.
         </p>
@@ -133,8 +136,8 @@ function ResultsInner() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
-        <p className="text-rose-300 font-semibold">Could not complete the scan</p>
-        <p className="text-slate-400 text-sm max-w-md">{error}</p>
+        <p className="text-rose-500 font-semibold">Could not complete the scan</p>
+        <p className="text-sm max-w-md" style={{ color: "var(--text-muted)" }}>{error}</p>
       </div>
     );
   }
@@ -148,26 +151,26 @@ function ResultsInner() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="text-xl font-bold text-slate-100 truncate max-w-lg">{report.url}</h1>
-          <p className="text-xs text-slate-500 mt-1">Scanned {new Date(report.created_at).toLocaleString()}</p>
+          <h1 className="text-xl font-bold truncate max-w-lg" style={{ color: "var(--text)" }}>{report.url}</h1>
+          <p className="text-xs mt-1" style={{ color: "var(--text-faint)" }}>Scanned {new Date(report.created_at).toLocaleString()}</p>
         </div>
         <button
           onClick={handleDownloadPdf}
           disabled={downloading}
-          className="text-xs font-semibold px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white whitespace-nowrap disabled:opacity-50"
+          className="text-xs font-semibold px-4 py-2 rounded-full text-white whitespace-nowrap disabled:opacity-50"
+          style={{ background: "var(--accent-strong)" }}
         >
           {downloading ? "Preparing PDF…" : "Download PDF Report"}
         </button>
       </div>
 
-      <div className="flex gap-1 border-b border-slate-800">
+      <div className="flex gap-1 border-b" style={{ borderColor: "var(--border)" }}>
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition ${
-              tab === t.id ? "border-cyan-400 text-cyan-200" : "border-transparent text-slate-400 hover:text-slate-200"
-            }`}
+            className="px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors"
+            style={tab === t.id ? { borderColor: "var(--accent)", color: "var(--accent)" } : { borderColor: "transparent", color: "var(--text-muted)" }}
           >
             {t.label}
           </button>
@@ -183,15 +186,18 @@ function ResultsInner() {
             <StatCard label="Needs manual testing" value={report.summary.needs_manual} />
           </section>
 
-          <section className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 flex flex-wrap items-center justify-between gap-4">
+          <section
+            className="rounded-xl border p-4 flex flex-wrap items-center justify-between gap-4"
+            style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+          >
             <div>
-              <p className="text-xs text-slate-400 uppercase tracking-wide">IS 17802 readiness (estimated)</p>
-              <p className="text-3xl font-bold text-slate-100">{report.summary.is17802_readiness_pct}%</p>
+              <p className="text-xs uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>IS 17802 readiness (estimated)</p>
+              <p className="text-3xl font-bold" style={{ color: "var(--text)" }}>{report.summary.is17802_readiness_pct}%</p>
             </div>
             {report.summary.high_risk_journeys.length > 0 && (
               <div>
-                <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">High-risk journeys for RPwD complaints</p>
-                <ul className="text-sm text-rose-300 list-disc list-inside">
+                <p className="text-xs uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>High-risk journeys for RPwD complaints</p>
+                <ul className="text-sm text-rose-500 list-disc list-inside">
                   {report.summary.high_risk_journeys.map((j) => (
                     <li key={j}>{j}</li>
                   ))}
@@ -200,7 +206,7 @@ function ResultsInner() {
             )}
           </section>
 
-          <p className="text-xs text-slate-500">
+          <p className="text-xs" style={{ color: "var(--text-faint)" }}>
             This report is generated by automated testing and covers roughly 30-40% of real-world
             accessibility barriers. It is not a substitute for manual testing with real assistive
             technology (NVDA, VoiceOver) and real disabled users.
@@ -241,7 +247,7 @@ function ResultsInner() {
 
 export default function DashboardResultsPage() {
   return (
-    <Suspense fallback={<div className="py-24 text-center text-slate-400 text-sm">Loading&hellip;</div>}>
+    <Suspense fallback={<div className="py-24 text-center text-sm" style={{ color: "var(--text-muted)" }}>Loading&hellip;</div>}>
       <ResultsInner />
     </Suspense>
   );

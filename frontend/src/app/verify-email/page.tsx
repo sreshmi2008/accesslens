@@ -31,14 +31,14 @@ function VerifyEmailInner() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center gap-4 px-6 text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center" style={{ background: "var(--background)", color: "var(--text)" }}>
       {status === "loading" && (
-        <div className="h-10 w-10 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
+        <div className="h-10 w-10 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }} />
       )}
-      {status === "success" && <p className="text-emerald-300 font-semibold text-lg">{message}</p>}
-      {status === "error" && <p className="text-rose-300 font-semibold text-lg">{message}</p>}
+      {status === "success" && <p className="text-emerald-500 font-semibold text-lg">{message}</p>}
+      {status === "error" && <p className="text-rose-500 font-semibold text-lg">{message}</p>}
       {status !== "loading" && (
-        <Link href="/" className="text-cyan-300 underline underline-offset-4 text-sm">
+        <Link href="/" className="underline underline-offset-4 text-sm" style={{ color: "var(--accent)" }}>
           Back to AccessLens
         </Link>
       )}
@@ -48,7 +48,7 @@ function VerifyEmailInner() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950" />}>
+    <Suspense fallback={<div className="min-h-screen" style={{ background: "var(--background)" }} />}>
       <VerifyEmailInner />
     </Suspense>
   );

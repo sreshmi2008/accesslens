@@ -23,13 +23,13 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: "var(--background)", color: "var(--text)" }}>
       <div className="w-full max-w-sm">
         <h1 className="text-xl font-bold mb-2">Reset your password</h1>
-        <p className="text-sm text-slate-400 mb-6">Enter your email and we&rsquo;ll send you a reset link.</p>
+        <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>Enter your email and we&rsquo;ll send you a reset link.</p>
 
         {message ? (
-          <p className="text-emerald-300 text-sm">{message}</p>
+          <p className="text-emerald-500 text-sm">{message}</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
@@ -38,19 +38,21 @@ export default function ForgotPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-sm outline-none focus:border-cyan-400"
+              className="w-full rounded-xl border px-4 py-3 text-sm outline-none"
+              style={{ borderColor: "var(--border-strong)", background: "var(--surface)", color: "var(--text)" }}
             />
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-xl px-6 py-3 text-sm font-bold bg-gradient-to-r from-cyan-500 to-purple-600 text-white disabled:opacity-50"
+              className="w-full rounded-xl px-6 py-3 text-sm font-bold text-white disabled:opacity-50"
+              style={{ background: "var(--accent-strong)" }}
             >
               {submitting ? "Sending…" : "Send Reset Link"}
             </button>
           </form>
         )}
 
-        <Link href="/" className="block text-cyan-300 underline underline-offset-4 text-sm mt-6">
+        <Link href="/" className="block underline underline-offset-4 text-sm mt-6" style={{ color: "var(--accent)" }}>
           Back to AccessLens
         </Link>
       </div>

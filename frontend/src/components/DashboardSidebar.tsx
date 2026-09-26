@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { AuthUser } from "@/lib/api";
+import ThemeToggle from "./ThemeToggle";
 
 const NAV_ITEMS = [
   {
@@ -38,10 +39,16 @@ export default function DashboardSidebar({ user, onLogout }: { user: AuthUser; o
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 shrink-0 border-r border-slate-800 bg-slate-900/30 flex flex-col min-h-screen">
-      <div className="px-5 py-5 border-b border-slate-800">
-        <Link href="/" className="flex items-center gap-2 font-bold text-slate-100">
-          <span className="grid place-items-center w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-600">
+    <aside
+      className="w-64 shrink-0 flex flex-col min-h-screen border-r"
+      style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+    >
+      <div className="px-5 py-5 border-b flex items-center justify-between" style={{ borderColor: "var(--border)" }}>
+        <Link href="/" className="flex items-center gap-2 font-bold" style={{ color: "var(--text)" }}>
+          <span
+            className="grid place-items-center w-8 h-8 rounded-lg"
+            style={{ background: "var(--accent-strong)" }}
+          >
             <svg width="16" height="16" fill="none" stroke="white" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -49,6 +56,7 @@ export default function DashboardSidebar({ user, onLogout }: { user: AuthUser; o
           </span>
           AccessLens
         </Link>
+        <ThemeToggle />
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">
@@ -58,11 +66,12 @@ export default function DashboardSidebar({ user, onLogout }: { user: AuthUser; o
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition border"
+              style={
                 active
-                  ? "bg-cyan-500/15 text-cyan-200 border border-cyan-500/30"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent"
-              }`}
+                  ? { background: "var(--accent-soft)", color: "var(--accent)", borderColor: "var(--accent)" }
+                  : { color: "var(--text-muted)", borderColor: "transparent" }
+              }
             >
               {item.icon}
               {item.label}
@@ -71,14 +80,15 @@ export default function DashboardSidebar({ user, onLogout }: { user: AuthUser; o
         })}
       </nav>
 
-      <div className="px-3 py-4 border-t border-slate-800 space-y-3">
+      <div className="px-3 py-4 border-t space-y-3" style={{ borderColor: "var(--border)" }}>
         <div className="px-2">
-          <p className="text-sm font-semibold text-slate-200 truncate">{user.name}</p>
-          <p className="text-xs text-slate-500 truncate">{user.email}</p>
+          <p className="text-sm font-semibold truncate" style={{ color: "var(--text)" }}>{user.name}</p>
+          <p className="text-xs truncate" style={{ color: "var(--text-faint)" }}>{user.email}</p>
         </div>
         <button
           onClick={onLogout}
-          className="w-full text-xs font-semibold px-3 py-2 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800/60"
+          className="w-full text-xs font-semibold px-3 py-2 rounded-lg border transition-colors"
+          style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
         >
           Logout
         </button>

@@ -13,13 +13,13 @@ export default function HistoryPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Scan History</h1>
-        <p className="text-sm text-slate-400 mt-1">Every scan you&rsquo;ve run, most recent first.</p>
+        <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>Every scan you&rsquo;ve run, most recent first.</p>
       </div>
 
       {reports.length === 0 ? (
-        <p className="text-sm text-slate-500">
+        <p className="text-sm" style={{ color: "var(--text-faint)" }}>
           No scans yet.{" "}
-          <Link href="/dashboard/new-scan" className="text-cyan-300 underline underline-offset-4">Run your first one</Link>.
+          <Link href="/dashboard/new-scan" className="underline underline-offset-4" style={{ color: "var(--accent)" }}>Run your first one</Link>.
         </p>
       ) : (
         <div className="grid sm:grid-cols-2 gap-3">

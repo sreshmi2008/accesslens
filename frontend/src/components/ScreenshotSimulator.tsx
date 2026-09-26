@@ -8,24 +8,25 @@ export default function ScreenshotSimulator({ screenshotBase64 }: { screenshotBa
   const filterId = COLOR_BLIND_MODES[mode].filterId;
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
+    <div className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
       <ColorBlindFilters />
       <div className="flex flex-wrap gap-2 mb-4">
         {(Object.keys(COLOR_BLIND_MODES) as ColorBlindMode[]).map((key) => (
           <button
             key={key}
             onClick={() => setMode(key)}
-            className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition ${
+            className="text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors"
+            style={
               mode === key
-                ? "bg-cyan-500/20 border-cyan-400 text-cyan-200"
-                : "bg-transparent border-slate-700 text-slate-400 hover:border-slate-500"
-            }`}
+                ? { background: "var(--accent-soft)", borderColor: "var(--accent)", color: "var(--accent)" }
+                : { background: "transparent", borderColor: "var(--border-strong)", color: "var(--text-muted)" }
+            }
           >
             {COLOR_BLIND_MODES[key].label}
           </button>
         ))}
       </div>
-      <div className="rounded-xl overflow-hidden border border-slate-800 max-h-[480px] overflow-y-auto">
+      <div className="rounded-xl overflow-hidden border max-h-[480px] overflow-y-auto" style={{ borderColor: "var(--border)" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`data:image/png;base64,${screenshotBase64}`}

@@ -17,6 +17,7 @@ export interface Finding {
   code_before: string | null;
   code_after: string | null;
   auto_fixable: boolean;
+  manual_test_hint: string;
   wcag_ref: string | null;
   selector: string;
   compliance_tags: ComplianceTag[];

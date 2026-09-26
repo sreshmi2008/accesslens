@@ -163,7 +163,7 @@ export default function AuthModal({
               {showResend && (
                 <div style={{ marginBottom: 14 }}>
                   <button type="button" onClick={handleResend} className="switch-auth" style={{ margin: 0 }}>
-                    <span style={{ textDecoration: "underline", cursor: "pointer", color: "#67e8f9" }}>
+                    <span style={{ textDecoration: "underline", cursor: "pointer", color: "var(--accent)" }}>
                       Resend verification email
                     </span>
                   </button>
@@ -178,7 +178,7 @@ export default function AuthModal({
 
             {!signup && (
               <p className="modal-note" style={{ marginTop: 12 }}>
-                <Link href="/forgot-password" style={{ color: "#67e8f9", textDecoration: "underline" }} onClick={onClose}>
+                <Link href="/forgot-password" style={{ color: "var(--accent)", textDecoration: "underline" }} onClick={onClose}>
                   Forgot your password?
                 </Link>
               </p>
