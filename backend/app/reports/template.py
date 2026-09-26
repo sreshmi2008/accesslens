@@ -34,6 +34,7 @@ def render_report_html(report: ScanReport) -> str:
               </div>
               <p>{html.escape(f.user_impact)}</p>
               <p class="fix"><strong>Suggested fix:</strong> {html.escape(f.suggested_fix)}</p>
+              <p class="fix"><strong>Manual test:</strong> {html.escape(f.manual_test_hint)}</p>
               {code_html}
               <p class="tags">{tags_html}</p>
             </div>

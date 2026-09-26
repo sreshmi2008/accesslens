@@ -1,6 +1,6 @@
 # AccessLens — Project Status & Roadmap
 
-_Last updated: 25 September 2026_
+_Last updated: 26 September 2026_
 
 This file exists so anyone picking this project up doesn't have to re-derive what's done, what's
 missing, and what to do next. If you're new here, read `GETTING_STARTED.md` first to get the app
@@ -30,8 +30,9 @@ to automate the easy ~30-40% of issues and clearly guide humans on the rest.
 | Real user accounts (signup/login/email verify/password reset) | ✅ Done | No (needs Resend key for real email delivery) |
 | Scan history dashboard (Overview / New Scan / History / Results tabs) | ✅ Done | No |
 | **True multi-step journeys** (actually complete a signup, search+filter, checkout) | ❌ Not built | No — separate work regardless of the key |
-| **Specific per-finding manual-test instructions** (e.g. "test this with NVDA") | ❌ Not built — only a generic blanket disclaimer exists | No — separate prompt work needed |
-| Chrome extension | ❌ Broken — doesn't send a login token, so every scan gets rejected | No |
+| Specific per-finding manual-test instructions (e.g. "test this with NVDA") | ✅ Done — every finding now shows a "Manual test:" hint, tested end-to-end | No (works via the fallback table without a key; gets more specific per-element with one) |
+| Chrome extension | ✅ Fixed — now has its own login form, stores a token, sends it on scans. Tested end-to-end in real Chromium (login → authenticated scan → opens results). | No |
+| **Database migration to Supabase (hosted Postgres)** | ✅ Done — live and verified. Data survives a full backend restart (tested). | No |
 | Hosting / public URL | ❌ Not started | No |
 | Automated tests | ❌ None — everything verified by hand so far | No |
 
@@ -45,22 +46,23 @@ to automate the easy ~30-40% of issues and clearly guide humans on the rest.
    try/except that silently falls back to generic text on any error, so check the backend
    terminal for a logged exception.
 
-2. **Add specific manual-test recommendations per finding.**
-   This is a real gap from the original idea, not yet built. The fix: extend the prompt in
-   `backend/app/ai/claude_client.py` (`SYSTEM_PROMPT`) to also ask Claude for a
-   `manual_test_hint` field (e.g. "Test this field with NVDA or VoiceOver active" for a
-   screen-reader finding, "Test this flow using only Tab/Enter/Esc" for a motor-impaired one),
-   then thread that new field through `Finding` in `backend/app/models.py`, the narration parsing
-   in `claude_client.py`, and `FindingCard.tsx` on the frontend to display it.
+2. ~~Add specific manual-test recommendations per finding.~~ **Done.** Claude's prompt now asks
+   for a `manual_test_hint` per finding, with a persona-keyed fallback table
+   (`_MANUAL_TEST_HINT_BY_PERSONA` in `backend/app/ai/claude_client.py`) for when there's no key.
+   Shown on every finding card and in the PDF report.
 
-3. **Fix the Chrome extension's auth.**
-   `extension/popup.js` calls `POST /api/scan` with no `Authorization` header, so it now always
-   gets a 401. Simplest fix: add a tiny login form to `extension/popup.html`/`popup.js` that calls
-   `/api/auth/login` and stores the returned token in `chrome.storage.local`, then attaches it as
-   a Bearer header on the scan request — mirrors what `frontend/src/lib/AuthContext.tsx` already
-   does, just in extension-storage form instead of `localStorage`.
+3. ~~Fix the Chrome extension's auth.~~ **Done.** `extension/popup.html`/`popup.js` now have a
+   login form; the token is stored in `chrome.storage.local` and sent as a Bearer header on scans.
+   Verified end-to-end in a real (non-headless) Chromium instance with the extension actually
+   loaded: login succeeds, the scan request carries the auth header, the scan completes, and it
+   opens the results page — same as the web dashboard's flow.
 
-4. **Build real multi-step journey simulation.**
+4. ~~Migrate the database to Supabase.~~ **Done.** `backend/.env`'s `DATABASE_URL` now points at
+   Supabase Postgres via the **session pooler** (not the direct connection — see the known-bugs
+   note below for why). Verified: signup, login, scanning, and history all work against it, and
+   data survives a full backend restart.
+
+5. **Build real multi-step journey simulation.**
    Currently, "journeys" are just "is this element inside a `<form>` tag or not" — see
    `backend/app/scanner/browser.py`. To actually simulate a signup/login/checkout flow, the
    scanner would need to identify and interact with real UI (fill fields, click submit, follow
@@ -69,17 +71,28 @@ to automate the easy ~30-40% of issues and clearly guide humans on the rest.
    bolted on quickly — it needs a plan for how to detect "this is a signup form" vs "this is a
    search box" reliably across arbitrary sites.
 
-5. **Deploy it so it has a public link.**
+6. **Deploy it so it has a public link.**
    See `GETTING_STARTED.md` Section 14 for the beginner-level overview (Vercel for the frontend,
-   Render/Railway/Fly.io for the backend, a real hosted database like Neon/Supabase Postgres
-   instead of the local SQLite file). Nothing has been set up yet — this is a from-scratch task.
+   Render/Railway/Fly.io for the backend). With Supabase already handling the database (once step 4
+   above is done), this step is just about hosting the frontend and backend themselves. Nothing has
+   been set up yet — this is a from-scratch task.
 
-6. **Add automated tests.**
+7. **Add automated tests.**
    None exist yet. Backend: `pytest` against the FastAPI endpoints (auth flow, scan persistence).
    Frontend: at minimum, component tests for `FindingCard`, `AuthModal`, and the results tabs.
 
 ## Known bugs already found and fixed (don't rediscover these)
 
+- **Supabase's "Direct connection" string fails with `could not translate host name` on many
+  networks.** New Supabase projects' direct connection hostname (`db.<project-ref>.supabase.co`)
+  only resolves to an IPv6 address, and plenty of networks (including whatever this was set up on)
+  can't reach IPv6-only hosts. The fix isn't the paid "IPv4 add-on" Supabase upsells for this — use
+  the free **Session pooler** connection string instead (in the Supabase dashboard's "Connect"
+  modal → Direct tab → "Connection Method" → select "Session pooler"). Note its username format is
+  different too: `postgres.<project-ref>` instead of plain `postgres`, and the host becomes
+  `aws-0-<region>.pooler.supabase.com`. Also: if the database password contains `@` or other
+  URL-special characters, percent-encode them in the connection string (`@` → `%40`) or the URI
+  parser will misread where the password ends and the host begins.
 - **`uvicorn --reload` breaks Playwright on Windows.** It ends up on an event loop that can't
   launch subprocesses (`NotImplementedError`). Fix already in `backend/app/main.py` (forces
   `WindowsProactorEventLoopPolicy`), but `--reload` itself still shouldn't be used — restart the
@@ -102,6 +115,15 @@ to automate the easy ~30-40% of issues and clearly guide humans on the rest.
   requires auth and a browser navigation can't send a custom `Authorization` header, the frontend
   fetches it with `fetch()` + the header and triggers a blob download instead (see
   `downloadReportPdf` in `frontend/src/lib/api.ts`).
+- **The extension needs the `"storage"` permission in `manifest.json`** to save the login token via
+  `chrome.storage.local` — easy to forget when adding new `chrome.*` API usage.
+- **You can't automate-test the extension's "current tab" detection.** `activeTab` (the permission
+  that lets the extension read the current tab's URL) only activates on a genuine user gesture
+  (an actual click on the toolbar icon) — Playwright opening `popup.html` directly as a page
+  doesn't count, so `chrome.tabs.query` returns a tab with no `url` field in that scenario. This
+  is expected and not a bug; it's why `extension/popup.js` was tested for its login/auth-header
+  logic by forcing `currentTabUrl` directly in an evaluated script rather than relying on tab
+  detection during automated tests.
 
 ## Where things live (quick map)
 
@@ -114,3 +136,4 @@ to automate the easy ~30-40% of issues and clearly guide humans on the rest.
 - Frontend auth state (shared across the app): `frontend/src/lib/AuthContext.tsx`
 - Dashboard pages: `frontend/src/app/dashboard/`
 - Landing page: `frontend/src/app/page.tsx` + `frontend/src/app/landing.css`
+- Chrome extension: `extension/` (`popup.html`/`popup.js`/`popup.css`, `manifest.json`)

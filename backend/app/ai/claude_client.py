@@ -39,6 +39,11 @@ object has exactly these keys:
 auto-fixable in a snippet (e.g. it needs a design decision)
 - "auto_fixable": true if this is a mechanical fix (contrast, alt text, labels, focus outline, \
 target size/spacing), false if it needs human judgement (complex ARIA, workflow redesign)
+- "manual_test_hint": one concrete, specific instruction for a human tester to manually verify \
+this exact finding with real assistive tech, naming the journey and the actual tool \
+(e.g. "Tab through the Form Interaction Journey with a keyboard only and confirm this field's \
+focus order makes sense" or "Test this button's label with NVDA or VoiceOver to confirm it \
+announces its purpose, not just 'button'")
 """
 
 
@@ -77,6 +82,18 @@ def _build_prompt(items: list[tuple[RawFinding, int]]) -> str:
     return json.dumps(payload, indent=2)
 
 
+_MANUAL_TEST_HINT_BY_PERSONA = {
+    Persona.screen_reader: "Test this with a real screen reader (NVDA on Windows or VoiceOver on "
+    "Mac) to confirm it's announced clearly and with enough context.",
+    Persona.color_blind: "View this page with a color-blindness simulator (e.g. Chrome DevTools' "
+    "'Emulate vision deficiencies' panel) to confirm the meaning doesn't rely on color alone.",
+    Persona.low_vision: "Test at 200% browser zoom to confirm the text stays readable and doesn't "
+    "get cut off or overlap other content.",
+    Persona.motor_impaired: "Test this using only a keyboard (Tab, Enter, Space, Esc) — no mouse "
+    "— to confirm it's fully operable and easy to hit.",
+}
+
+
 def _fallback_finding(raw: RawFinding, count: int) -> Finding:
     persona = Persona(_PERSONA_HINTS.get(raw.rule_id, "screen_reader"))
     impact = raw.description
@@ -93,6 +110,7 @@ def _fallback_finding(raw: RawFinding, count: int) -> Finding:
         code_before=raw.html_snippet or None,
         code_after=None,
         auto_fixable=False,
+        manual_test_hint=_MANUAL_TEST_HINT_BY_PERSONA[persona],
         wcag_ref=raw.wcag_ref,
         selector=raw.selector,
     )
@@ -153,6 +171,7 @@ async def narrate_findings(raw_findings: list[RawFinding]) -> list[Finding]:
                 code_before=raw.html_snippet or None,
                 code_after=n.get("code_after"),
                 auto_fixable=bool(n.get("auto_fixable", False)),
+                manual_test_hint=n.get("manual_test_hint") or _MANUAL_TEST_HINT_BY_PERSONA[persona],
                 wcag_ref=raw.wcag_ref,
                 selector=raw.selector,
             )

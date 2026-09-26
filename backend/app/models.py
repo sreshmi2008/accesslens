@@ -46,6 +46,7 @@ class Finding(BaseModel):
     code_before: Optional[str] = None
     code_after: Optional[str] = None
     auto_fixable: bool
+    manual_test_hint: str
     wcag_ref: Optional[str] = None
     selector: str
     compliance_tags: list[ComplianceTag] = Field(default_factory=list)
