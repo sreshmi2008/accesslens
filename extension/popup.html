@@ -10,10 +10,25 @@
     <span class="dot"></span>
     <strong>AccessLens</strong>
   </div>
-  <p class="tagline">Scan this page for accessibility barriers, through the eyes of real disabled users.</p>
-  <p id="currentUrl" class="url"></p>
-  <button id="scanButton" type="button">Scan this page</button>
-  <p id="status" class="status" role="status" aria-live="polite"></p>
+
+  <div id="loginView">
+    <p class="tagline">Log in to scan pages from your browser toolbar.</p>
+    <form id="loginForm">
+      <input id="loginEmail" type="email" placeholder="you@example.com" required />
+      <input id="loginPassword" type="password" placeholder="Password" required />
+      <button id="loginButton" type="submit">Login</button>
+    </form>
+    <p id="loginStatus" class="status" role="status" aria-live="polite"></p>
+  </div>
+
+  <div id="scanView" class="hidden">
+    <p class="tagline">Scan this page for accessibility barriers, through the eyes of real disabled users.</p>
+    <p id="currentUrl" class="url"></p>
+    <button id="scanButton" type="button">Scan this page</button>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+    <button id="logoutButton" type="button" class="link-button">Logout</button>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>

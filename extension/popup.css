@@ -61,3 +61,35 @@ button:disabled {
   margin: 10px 0 0;
   min-height: 16px;
 }
+
+.hidden {
+  display: none !important;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  font-size: 0.82rem;
+}
+
+input::placeholder {
+  color: #64748b;
+}
+
+.link-button {
+  width: auto;
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #67e8f9;
+  font-weight: 600;
+  font-size: 0.74rem;
+  text-decoration: underline;
+}
