@@ -16,8 +16,8 @@ const STOP_REASON_LABEL: Record<string, string> = {
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border p-4 text-center" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-      <div className="text-2xl font-bold" style={{ color: "var(--text)" }}>{value}</div>
+    <div className="al-card p-4 text-center">
+      <div className="text-2xl font-bold al-gradient-text">{value}</div>
       <div className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>{label}</div>
     </div>
   );
@@ -26,8 +26,8 @@ function StatCard({ label, value }: { label: string; value: string | number }) {
 function ActionBadge({ name }: { name: string }) {
   return (
     <span
-      className="text-[0.65rem] font-mono px-2 py-0.5 rounded-full border"
-      style={{ borderColor: "var(--border-strong)", color: "var(--text-muted)" }}
+      className="text-[0.65rem] font-mono font-semibold px-2 py-0.5 rounded-full border"
+      style={{ borderColor: "var(--accent)", background: "var(--accent-soft)", color: "var(--accent)" }}
     >
       {name}
     </span>
@@ -68,12 +68,28 @@ function ResultsInner() {
   }, [id, token, authLoading]);
 
   if (loading) {
-    return <p className="py-24 text-center text-sm" style={{ color: "var(--text-muted)" }}>Loading…</p>;
+    return (
+      <div className="flex flex-col items-center justify-center gap-5 py-28 text-center">
+        <div className="relative h-12 w-12">
+          <div className="absolute inset-0 rounded-full opacity-20 blur-md" style={{ background: "linear-gradient(135deg, var(--accent-strong), var(--accent-2))" }} />
+          <div
+            className="relative h-12 w-12 rounded-full border-[3px] border-t-transparent animate-spin"
+            style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }}
+          />
+        </div>
+        <p className="text-sm" style={{ color: "var(--text-muted)" }}>Loading journey…</p>
+      </div>
+    );
   }
 
   if (error || !report) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
+      <div className="flex flex-col items-center justify-center gap-3 py-28 text-center">
+        <div className="al-stat-icon" style={{ color: "#fb7185", background: "rgba(244, 63, 94, 0.12)" }}>
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M10.29 3.86l-8.3 14.39A2 2 0 003.72 21h16.56a2 2 0 001.73-2.75l-8.3-14.39a2 2 0 00-3.42 0z" />
+          </svg>
+        </div>
         <p className="text-rose-500 font-semibold">Could not load this journey</p>
         <p className="text-sm max-w-md" style={{ color: "var(--text-muted)" }}>{error}</p>
       </div>
@@ -85,8 +101,8 @@ function ResultsInner() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-xl font-bold truncate max-w-lg" style={{ color: "var(--text)" }}>{report.url}</h1>
-        <p className="text-xs mt-1" style={{ color: "var(--text-faint)" }}>
+        <h1 className="text-2xl font-bold tracking-tight truncate max-w-lg" style={{ color: "var(--text)" }}>{report.url}</h1>
+        <p className="text-xs mt-1.5" style={{ color: "var(--text-faint)" }}>
           Run {new Date(report.created_at).toLocaleString()}
           {report.goal && <> &middot; Goal: {report.goal}</>}
         </p>
@@ -103,12 +119,12 @@ function ResultsInner() {
       </section>
 
       <section className="space-y-6">
-        <h2 className="text-lg font-semibold">Step by step</h2>
+        <h2 className="text-lg font-bold tracking-tight">Step by step</h2>
         {report.steps.length === 0 ? (
           <p className="text-sm" style={{ color: "var(--text-muted)" }}>No steps were recorded for this journey.</p>
         ) : (
           report.steps.map((step) => (
-            <div key={step.step_number} className="rounded-2xl border p-5 space-y-3" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+            <div key={step.step_number} className="al-card p-5 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>Step {step.step_number}</p>
@@ -145,7 +161,14 @@ function ResultsInner() {
       </section>
 
       {allFindings.length === 0 && (
-        <p className="text-sm text-emerald-500">No barriers detected across this journey&rsquo;s steps.</p>
+        <div className="al-card p-5 flex items-center gap-3">
+          <div className="al-stat-icon shrink-0" style={{ color: "#34d399", background: "rgba(52, 211, 153, 0.12)" }}>
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-sm" style={{ color: "var(--text-muted)" }}>No barriers detected across this journey&rsquo;s steps.</p>
+        </div>
       )}
     </div>
   );

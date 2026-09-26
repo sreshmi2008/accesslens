@@ -9,37 +9,53 @@
 
 :root,
 :root[data-theme="dark"] {
-  --background: #09090b;
-  --surface: #0f0f12;
-  --surface-raised: #17171b;
-  --surface-hover: #1e1e23;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
+  --background: #08080a;
+  --surface: #0e0e11;
+  --surface-raised: #16161a;
+  --surface-hover: #1c1c21;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.13);
   --text: #fafafa;
   --text-muted: #a1a1aa;
-  --text-faint: #71717a;
+  --text-faint: #6b6b73;
   --accent: #818cf8;
   --accent-strong: #6366f1;
-  --accent-soft: rgba(129, 140, 248, 0.14);
+  --accent-2: #a78bfa;
+  --accent-soft: rgba(129, 140, 248, 0.13);
   --accent-contrast: #ffffff;
   --foreground: var(--text);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 28px -8px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --shadow-glow: 0 8px 30px -6px rgba(99, 102, 241, 0.35);
+  --ambient: radial-gradient(1100px 520px at 12% -12%, rgba(99, 102, 241, 0.16), transparent 60%),
+    radial-gradient(900px 480px at 100% 0%, rgba(167, 139, 250, 0.1), transparent 55%);
 }
 
 :root[data-theme="light"] {
-  --background: #fafafa;
+  --background: #f7f7f9;
   --surface: #ffffff;
   --surface-raised: #ffffff;
-  --surface-hover: #f4f4f5;
-  --border: #e4e4e7;
-  --border-strong: #d4d4d8;
+  --surface-hover: #f4f4f6;
+  --border: rgba(24, 24, 27, 0.08);
+  --border-strong: rgba(24, 24, 27, 0.14);
   --text: #18181b;
   --text-muted: #52525b;
-  --text-faint: #71717a;
+  --text-faint: #8a8a92;
   --accent: #4f46e5;
   --accent-strong: #4338ca;
-  --accent-soft: rgba(79, 70, 229, 0.08);
+  --accent-2: #7c3aed;
+  --accent-soft: rgba(79, 70, 229, 0.07);
   --accent-contrast: #ffffff;
   --foreground: var(--text);
+
+  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.04), 0 1px 3px rgba(24, 24, 27, 0.05);
+  --shadow-md: 0 12px 24px -8px rgba(24, 24, 27, 0.10), 0 2px 6px rgba(24, 24, 27, 0.05);
+  --shadow-lg: 0 24px 48px -12px rgba(24, 24, 27, 0.14);
+  --shadow-glow: 0 8px 24px -6px rgba(79, 70, 229, 0.25);
+  --ambient: radial-gradient(1100px 520px at 12% -12%, rgba(79, 70, 229, 0.06), transparent 60%),
+    radial-gradient(900px 480px at 100% 0%, rgba(124, 58, 237, 0.05), transparent 55%);
 }
 
 @theme inline {
@@ -54,6 +70,112 @@ body {
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
   transition: background-color 0.2s ease, color 0.2s ease;
+  letter-spacing: -0.011em;
+}
+
+/* ============================================================
+   PREMIUM APP-SURFACE PRIMITIVES
+   Shared card/button/stat patterns for the dashboard, used
+   instead of flat bordered <div>s so every surface gets
+   consistent elevation, motion, and an accent-tinted glow.
+============================================================ */
+
+.al-bg {
+  position: relative;
+  background: var(--ambient), var(--background);
+}
+
+.al-card {
+  position: relative;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s cubic-bezier(.2,.8,.2,1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.al-card-interactive:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.al-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent-soft), transparent);
+  color: var(--accent);
+  border: 1px solid var(--border);
+}
+
+.al-gradient-text {
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.al-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: transform 0.2s cubic-bezier(.2,.8,.2,1), box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.al-btn-primary {
+  color: var(--accent-contrast);
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent-2));
+  box-shadow: var(--shadow-glow);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.al-btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 12px 36px -6px rgba(99, 102, 241, 0.45);
+}
+
+.al-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.al-btn-primary:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+
+.al-btn-outline {
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+}
+
+.al-btn-outline:hover {
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+.al-input {
+  border-radius: 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--background);
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.al-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
 /* ============================================================
@@ -66,21 +188,21 @@ body {
 .button-primary {
   position: relative;
   overflow: hidden;
-  border: 1px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 14px;
   color: var(--accent-contrast);
-  background: var(--accent-strong);
-  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.22);
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent-2));
+  box-shadow: var(--shadow-glow);
   transition:
     transform 0.2s cubic-bezier(.2,.8,.2,1),
     box-shadow 0.2s ease,
-    background-color 0.2s ease;
+    filter 0.2s ease;
 }
 
 .button-primary:hover {
   transform: translateY(-2px);
-  background: var(--accent);
-  box-shadow: 0 16px 32px rgba(79, 70, 229, 0.3);
+  filter: brightness(1.06);
+  box-shadow: 0 16px 40px -6px rgba(99, 102, 241, 0.45);
 }
 
 .button-primary span {
@@ -122,21 +244,27 @@ body {
 .modal-bg {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
 }
 
 .modal-panel {
   position: relative;
   z-index: 1;
   width: min(100%, 440px);
-  padding: 31px;
+  padding: 34px;
   border: 1px solid var(--border-strong);
-  border-radius: 24px;
+  border-radius: 28px;
   background: var(--surface-raised);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-lg);
   color: var(--text);
   font-family: var(--font-inter), sans-serif;
+  animation: al-modal-in 0.25s cubic-bezier(.2,.8,.2,1);
+}
+
+@keyframes al-modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .close-modal {
@@ -165,13 +293,15 @@ body {
   place-items: center;
   margin-bottom: 18px;
   border-radius: 14px;
-  background: var(--accent-strong);
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent-2));
+  box-shadow: var(--shadow-glow);
 }
 
 .modal-panel h2 {
   margin: 0 0 8px;
   font-family: var(--font-space-grotesk), sans-serif;
-  font-size: 1.72rem;
+  font-size: 1.85rem;
+  letter-spacing: -0.02em;
   color: var(--text);
 }
 

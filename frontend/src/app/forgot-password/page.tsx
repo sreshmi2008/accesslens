@@ -23,9 +23,9 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: "var(--background)", color: "var(--text)" }}>
-      <div className="w-full max-w-sm">
-        <h1 className="text-xl font-bold mb-2">Reset your password</h1>
+    <div className="al-bg min-h-screen flex flex-col items-center justify-center px-6" style={{ color: "var(--text)" }}>
+      <div className="al-card w-full max-w-sm p-8">
+        <h1 className="text-xl font-bold tracking-tight mb-2">Reset your password</h1>
         <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>Enter your email and we&rsquo;ll send you a reset link.</p>
 
         {message ? (
@@ -38,15 +38,9 @@ export default function ForgotPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-xl border px-4 py-3 text-sm outline-none"
-              style={{ borderColor: "var(--border-strong)", background: "var(--surface)", color: "var(--text)" }}
+              className="al-input w-full px-4 py-3 text-sm"
             />
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full rounded-xl px-6 py-3 text-sm font-bold text-white disabled:opacity-50"
-              style={{ background: "var(--accent-strong)" }}
-            >
+            <button type="submit" disabled={submitting} className="al-btn al-btn-primary w-full py-3 text-sm">
               {submitting ? "Sending…" : "Send Reset Link"}
             </button>
           </form>

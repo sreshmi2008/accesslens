@@ -8,9 +8,18 @@ const SEVERITY_STYLE: Record<Finding["severity"], string> = {
   minor: "border-[var(--border-strong)]",
 };
 
+const SEVERITY_BAR: Record<Finding["severity"], string> = {
+  critical: "#f43f5e",
+  serious: "#fb7185",
+  moderate: "#f59e0b",
+  minor: "var(--border-strong)",
+};
+
 export default function FindingCard({ finding }: { finding: Finding }) {
   return (
-    <div className="rounded-xl border p-4 space-y-3" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+    <div className="al-card relative p-4 pl-5 space-y-3 overflow-hidden">
+      <span className="absolute left-0 top-0 bottom-0 w-1" style={{ background: SEVERITY_BAR[finding.severity] }} />
+
       <div className="flex flex-wrap items-center gap-2">
         <h4 className="font-semibold" style={{ color: "var(--text)" }}>{finding.title}</h4>
         <span className={`text-[0.65rem] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border ${SEVERITY_STYLE[finding.severity]}`}>

@@ -67,39 +67,32 @@ export default function AiJourneyPage() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-2xl font-bold">AI-Driven Journeys</h1>
-        <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+        <h1 className="text-3xl font-bold tracking-tight">AI-Driven Journeys</h1>
+        <p className="text-sm mt-2 max-w-2xl" style={{ color: "var(--text-muted)" }}>
           Claude drives a real browser through the site — clicking, typing, and navigating like a real
           visitor — checking accessibility at every step. Requires a Claude API key with Computer Use
           access to be configured on the server.
         </p>
       </div>
 
-      <div className="rounded-2xl border p-6" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+      <div className="al-card p-6">
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://yourwebsite.com"
-            className="w-full rounded-xl border px-4 py-3 text-sm outline-none"
-            style={{ borderColor: "var(--border-strong)", background: "var(--background)", color: "var(--text)" }}
+            className="al-input w-full px-4 py-3 text-sm"
           />
           <input
             type="text"
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
             placeholder='Optional: what should it try to do? (e.g. "sign up for an account")'
-            className="w-full rounded-xl border px-4 py-3 text-sm outline-none"
-            style={{ borderColor: "var(--border-strong)", background: "var(--background)", color: "var(--text)" }}
+            className="al-input w-full px-4 py-3 text-sm"
           />
           {error && <p className="text-rose-500 text-sm">{error}</p>}
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-xl px-6 py-3 text-sm font-bold text-white disabled:opacity-50"
-            style={{ background: "var(--accent-strong)" }}
-          >
+          <button type="submit" disabled={submitting} className="al-btn al-btn-primary px-6 py-3 text-sm">
             {submitting ? "Running the journey…" : "Start AI Journey"}
           </button>
           {submitting && (
@@ -111,7 +104,7 @@ export default function AiJourneyPage() {
       </div>
 
       <section>
-        <h2 className="text-lg font-semibold mb-4">Past AI journeys</h2>
+        <h2 className="text-lg font-bold tracking-tight mb-4">Past AI journeys</h2>
         {loadingList ? (
           <p className="text-sm" style={{ color: "var(--text-faint)" }}>Loading…</p>
         ) : journeys.length === 0 ? (
@@ -122,8 +115,7 @@ export default function AiJourneyPage() {
               <Link
                 key={j.id}
                 href={`/dashboard/ai-journey/results?id=${j.id}`}
-                className="rounded-xl border p-4 transition-colors block"
-                style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+                className="al-card al-card-interactive block p-4"
               >
                 <p className="text-sm font-semibold truncate" style={{ color: "var(--text)" }}>{j.url}</p>
                 {j.goal && <p className="text-xs mt-1 truncate" style={{ color: "var(--text-muted)" }}>Goal: {j.goal}</p>}

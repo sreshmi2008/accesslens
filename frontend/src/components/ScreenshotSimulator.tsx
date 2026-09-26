@@ -8,17 +8,17 @@ export default function ScreenshotSimulator({ screenshotBase64 }: { screenshotBa
   const filterId = COLOR_BLIND_MODES[mode].filterId;
 
   return (
-    <div className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+    <div className="al-card p-4">
       <ColorBlindFilters />
       <div className="flex flex-wrap gap-2 mb-4">
         {(Object.keys(COLOR_BLIND_MODES) as ColorBlindMode[]).map((key) => (
           <button
             key={key}
             onClick={() => setMode(key)}
-            className="text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors"
+            className="text-xs font-semibold px-3 py-1.5 rounded-full border transition-all duration-200"
             style={
               mode === key
-                ? { background: "var(--accent-soft)", borderColor: "var(--accent)", color: "var(--accent)" }
+                ? { background: "linear-gradient(135deg, var(--accent-strong), var(--accent-2))", borderColor: "transparent", color: "white", boxShadow: "var(--shadow-sm)" }
                 : { background: "transparent", borderColor: "var(--border-strong)", color: "var(--text-muted)" }
             }
           >

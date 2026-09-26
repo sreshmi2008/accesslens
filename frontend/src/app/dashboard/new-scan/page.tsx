@@ -45,27 +45,22 @@ export default function NewScanPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">New Scan</h1>
-        <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+        <h1 className="text-3xl font-bold tracking-tight">New Scan</h1>
+        <p className="text-sm mt-2" style={{ color: "var(--text-muted)" }}>
           AccessLens will drive a real headless browser through the page and simulate color-blind,
           low-vision, motor-impaired, and screen-reader journeys.
         </p>
       </div>
 
-      <div className="rounded-2xl border p-6" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+      <div className="al-card p-6">
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
           <input
             ref={urlInputRef}
             type="url"
             placeholder="https://yourwebsite.com"
-            className="flex-1 rounded-xl border px-4 py-3 text-sm outline-none"
-            style={{ borderColor: "var(--border-strong)", background: "var(--background)", color: "var(--text)" }}
+            className="al-input flex-1 px-4 py-3 text-sm"
           />
-          <button
-            type="submit"
-            className="rounded-xl px-6 py-3 text-sm font-bold text-white whitespace-nowrap"
-            style={{ background: "var(--accent-strong)" }}
-          >
+          <button type="submit" className="al-btn al-btn-primary px-6 py-3 text-sm">
             Test Website
           </button>
         </form>
@@ -73,14 +68,13 @@ export default function NewScanPage() {
       </div>
 
       <div>
-        <p className="text-sm mb-3" style={{ color: "var(--text-muted)" }}>Or try a demo site:</p>
+        <p className="text-sm mb-3 font-medium" style={{ color: "var(--text-muted)" }}>Or try a demo site:</p>
         <div className="grid sm:grid-cols-2 gap-3">
           {Object.values(DEMOS).map((demo) => (
             <button
               key={demo.url}
               onClick={() => goToScan(demo.url)}
-              className="text-left rounded-xl border p-4 transition-colors"
-              style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+              className="al-card al-card-interactive text-left p-4"
             >
               <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{demo.label}</p>
               <p className="text-xs mt-1 truncate" style={{ color: "var(--text-faint)" }}>{demo.url}</p>
@@ -89,18 +83,18 @@ export default function NewScanPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border p-4 flex items-center justify-between gap-4 flex-wrap" style={{ borderColor: "var(--border)", background: "var(--accent-soft)" }}>
-        <div>
+      <div className="al-card relative overflow-hidden p-5 flex items-center justify-between gap-4 flex-wrap">
+        <div
+          className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, var(--accent-soft), transparent 70%)" }}
+        />
+        <div className="relative">
           <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>Want AI to actually click through the site?</p>
           <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
             AI Journeys let Claude sign up, fill forms, and navigate like a real visitor, checking accessibility at every step.
           </p>
         </div>
-        <Link
-          href="/dashboard/ai-journey"
-          className="text-xs font-bold px-4 py-2 rounded-full text-white whitespace-nowrap"
-          style={{ background: "var(--accent-strong)" }}
-        >
+        <Link href="/dashboard/ai-journey" className="al-btn al-btn-primary relative px-5 py-2.5 text-xs">
           Try AI Journeys
         </Link>
       </div>

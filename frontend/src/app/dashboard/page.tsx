@@ -5,11 +5,30 @@ import { useAuth } from "@/lib/AuthContext";
 import { useReports } from "@/lib/useReports";
 import ScanHistoryCard from "@/components/ScanHistoryCard";
 
-function StatCard({ label, value }: { label: string; value: string | number }) {
+const STAT_ICONS = {
+  scans: (
+    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 19a8 8 0 100-16 8 8 0 000 16zM21 21l-4.35-4.35" />
+    </svg>
+  ),
+  barriers: (
+    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M10.29 3.86l-8.3 14.39A2 2 0 003.72 21h16.56a2 2 0 001.73-2.75l-8.3-14.39a2 2 0 00-3.42 0z" />
+    </svg>
+  ),
+  readiness: (
+    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+};
+
+function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-      <p className="text-2xl font-bold" style={{ color: "var(--text)" }}>{value}</p>
-      <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>{label}</p>
+    <div className="al-card p-5">
+      <div className="al-stat-icon mb-4">{icon}</div>
+      <p className="text-3xl font-bold tracking-tight al-gradient-text">{value}</p>
+      <p className="text-xs mt-1.5" style={{ color: "var(--text-muted)" }}>{label}</p>
     </div>
   );
 }
@@ -25,42 +44,42 @@ export default function DashboardOverviewPage() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-2xl font-bold">Welcome back, {user?.name}</h1>
-        <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+        <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user?.name}</h1>
+        <p className="text-sm mt-2" style={{ color: "var(--text-muted)" }}>
           Here&rsquo;s a snapshot of your accessibility testing so far.
         </p>
       </div>
 
       <section className="grid grid-cols-3 gap-4">
-        <StatCard label="Scans run" value={totalScans} />
-        <StatCard label="Total barriers found" value={totalBarriers} />
-        <StatCard label="Average IS 17802 readiness" value={totalScans === 0 ? "—" : `${avgReadiness}%`} />
+        <StatCard icon={STAT_ICONS.scans} label="Scans run" value={totalScans} />
+        <StatCard icon={STAT_ICONS.barriers} label="Total barriers found" value={totalBarriers} />
+        <StatCard icon={STAT_ICONS.readiness} label="Average IS 17802 readiness" value={totalScans === 0 ? "—" : `${avgReadiness}%`} />
       </section>
 
       <section
-        className="rounded-2xl border p-6 flex items-center justify-between gap-4 flex-wrap"
-        style={{ borderColor: "var(--border)", background: "var(--accent-soft)" }}
+        className="al-card relative overflow-hidden p-7 flex items-center justify-between gap-4 flex-wrap"
+        style={{ borderColor: "var(--border-strong)" }}
       >
-        <div>
-          <h2 className="font-semibold" style={{ color: "var(--text)" }}>Ready to test another site?</h2>
-          <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+        <div
+          className="absolute -top-16 -right-16 w-56 h-56 rounded-full pointer-events-none"
+          style={{ background: "radial-gradient(circle, var(--accent-soft), transparent 70%)" }}
+        />
+        <div className="relative">
+          <h2 className="font-bold text-lg tracking-tight" style={{ color: "var(--text)" }}>Ready to test another site?</h2>
+          <p className="text-sm mt-1.5" style={{ color: "var(--text-muted)" }}>
             Simulate disabled-user journeys on any URL in under a minute.
           </p>
         </div>
-        <Link
-          href="/dashboard/new-scan"
-          className="text-sm font-bold px-5 py-2.5 rounded-full text-white whitespace-nowrap"
-          style={{ background: "var(--accent-strong)" }}
-        >
+        <Link href="/dashboard/new-scan" className="al-btn al-btn-primary relative px-6 py-3 text-sm">
           Start New Scan
         </Link>
       </section>
 
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Recent scans</h2>
+          <h2 className="text-lg font-bold tracking-tight">Recent scans</h2>
           {reports.length > 0 && (
-            <Link href="/dashboard/history" className="text-sm hover:underline" style={{ color: "var(--accent)" }}>
+            <Link href="/dashboard/history" className="text-sm font-medium hover:underline" style={{ color: "var(--accent)" }}>
               View all &rarr;
             </Link>
           )}

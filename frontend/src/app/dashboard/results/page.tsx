@@ -21,8 +21,8 @@ type TabId = (typeof TABS)[number]["id"];
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border p-4 text-center" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-      <div className="text-2xl font-bold" style={{ color: "var(--text)" }}>{value}</div>
+    <div className="al-card p-4 text-center">
+      <div className="text-2xl font-bold al-gradient-text">{value}</div>
       <div className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>{label}</div>
     </div>
   );
@@ -37,7 +37,7 @@ function JourneyBlock({ journey }: { journey: JourneyResult }) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>{journey.name}</h3>
+      <h3 className="text-lg font-bold tracking-tight" style={{ color: "var(--text)" }}>{journey.name}</h3>
       {journey.findings.length === 0 && (
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>No barriers found in this journey.</p>
       )}
@@ -120,11 +120,14 @@ function ResultsInner() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
-        <div
-          className="h-10 w-10 rounded-full border-2 border-t-transparent animate-spin"
-          style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }}
-        />
+      <div className="flex flex-col items-center justify-center gap-5 py-28 text-center">
+        <div className="relative h-12 w-12">
+          <div className="absolute inset-0 rounded-full opacity-20 blur-md" style={{ background: "linear-gradient(135deg, var(--accent-strong), var(--accent-2))" }} />
+          <div
+            className="relative h-12 w-12 rounded-full border-[3px] border-t-transparent animate-spin"
+            style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }}
+          />
+        </div>
         <p className="text-sm max-w-md" style={{ color: "var(--text-muted)" }}>
           Simulating disabled-user journeys on {url || "this site"}&hellip; this drives a real headless
           browser through the page, so it can take up to a minute.
@@ -135,7 +138,12 @@ function ResultsInner() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
+      <div className="flex flex-col items-center justify-center gap-3 py-28 text-center">
+        <div className="al-stat-icon" style={{ color: "#fb7185", background: "rgba(244, 63, 94, 0.12)" }}>
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M10.29 3.86l-8.3 14.39A2 2 0 003.72 21h16.56a2 2 0 001.73-2.75l-8.3-14.39a2 2 0 00-3.42 0z" />
+          </svg>
+        </div>
         <p className="text-rose-500 font-semibold">Could not complete the scan</p>
         <p className="text-sm max-w-md" style={{ color: "var(--text-muted)" }}>{error}</p>
       </div>
@@ -151,26 +159,25 @@ function ResultsInner() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="text-xl font-bold truncate max-w-lg" style={{ color: "var(--text)" }}>{report.url}</h1>
-          <p className="text-xs mt-1" style={{ color: "var(--text-faint)" }}>Scanned {new Date(report.created_at).toLocaleString()}</p>
+          <h1 className="text-2xl font-bold tracking-tight truncate max-w-lg" style={{ color: "var(--text)" }}>{report.url}</h1>
+          <p className="text-xs mt-1.5" style={{ color: "var(--text-faint)" }}>Scanned {new Date(report.created_at).toLocaleString()}</p>
         </div>
-        <button
-          onClick={handleDownloadPdf}
-          disabled={downloading}
-          className="text-xs font-semibold px-4 py-2 rounded-full text-white whitespace-nowrap disabled:opacity-50"
-          style={{ background: "var(--accent-strong)" }}
-        >
+        <button onClick={handleDownloadPdf} disabled={downloading} className="al-btn al-btn-primary px-5 py-2.5 text-xs">
           {downloading ? "Preparing PDF…" : "Download PDF Report"}
         </button>
       </div>
 
-      <div className="flex gap-1 border-b" style={{ borderColor: "var(--border)" }}>
+      <div className="flex gap-1 p-1 rounded-xl w-fit" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className="px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors"
-            style={tab === t.id ? { borderColor: "var(--accent)", color: "var(--accent)" } : { borderColor: "transparent", color: "var(--text-muted)" }}
+            className="px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200"
+            style={
+              tab === t.id
+                ? { background: "linear-gradient(135deg, var(--accent-strong), var(--accent-2))", color: "white", boxShadow: "var(--shadow-sm)" }
+                : { color: "var(--text-muted)" }
+            }
           >
             {t.label}
           </button>
@@ -186,13 +193,10 @@ function ResultsInner() {
             <StatCard label="Needs manual testing" value={report.summary.needs_manual} />
           </section>
 
-          <section
-            className="rounded-xl border p-4 flex flex-wrap items-center justify-between gap-4"
-            style={{ borderColor: "var(--border)", background: "var(--surface)" }}
-          >
+          <section className="al-card p-5 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>IS 17802 readiness (estimated)</p>
-              <p className="text-3xl font-bold" style={{ color: "var(--text)" }}>{report.summary.is17802_readiness_pct}%</p>
+              <p className="text-xs uppercase tracking-wide font-semibold" style={{ color: "var(--text-muted)" }}>IS 17802 readiness (estimated)</p>
+              <p className="text-4xl font-bold al-gradient-text mt-1">{report.summary.is17802_readiness_pct}%</p>
             </div>
             {report.summary.high_risk_journeys.length > 0 && (
               <div>
@@ -218,12 +222,12 @@ function ResultsInner() {
         <div className="space-y-8">
           {report.screenshot_base64 && (
             <section>
-              <h2 className="text-lg font-semibold mb-3">See it through a color-blind user&rsquo;s eyes</h2>
+              <h2 className="text-lg font-bold tracking-tight mb-3" style={{ color: "var(--text)" }}>See it through a color-blind user&rsquo;s eyes</h2>
               <ScreenshotSimulator screenshotBase64={report.screenshot_base64} />
             </section>
           )}
           <section>
-            <h2 className="text-lg font-semibold mb-3">Hear it through a screen-reader user&rsquo;s ears</h2>
+            <h2 className="text-lg font-bold tracking-tight mb-3" style={{ color: "var(--text)" }}>Hear it through a screen-reader user&rsquo;s ears</h2>
             <ScreenReaderDemo tree={accessibilityTree} />
           </section>
         </div>
@@ -232,10 +236,17 @@ function ResultsInner() {
       {tab === "findings" && (
         <div className="space-y-8">
           {allFindings.length === 0 ? (
-            <p className="text-sm text-emerald-300">
-              No barriers detected by the automated checks. Remember: this still covers only ~30-40% of
-              real-world issues &mdash; manual testing with assistive tech is still recommended.
-            </p>
+            <div className="al-card p-5 flex items-center gap-3">
+              <div className="al-stat-icon shrink-0" style={{ color: "#34d399", background: "rgba(52, 211, 153, 0.12)" }}>
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+                No barriers detected by the automated checks. Remember: this still covers only ~30-40% of
+                real-world issues &mdash; manual testing with assistive tech is still recommended.
+              </p>
+            </div>
           ) : (
             report.journeys.map((j) => <JourneyBlock key={j.name} journey={j} />)
           )}

@@ -12,8 +12,8 @@ export default function HistoryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Scan History</h1>
-        <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>Every scan you&rsquo;ve run, most recent first.</p>
+        <h1 className="text-3xl font-bold tracking-tight">Scan History</h1>
+        <p className="text-sm mt-2" style={{ color: "var(--text-muted)" }}>Every scan you&rsquo;ve run, most recent first.</p>
       </div>
 
       {reports.length === 0 ? (

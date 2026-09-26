@@ -32,9 +32,9 @@ function ResetPasswordInner() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: "var(--background)", color: "var(--text)" }}>
-      <div className="w-full max-w-sm">
-        <h1 className="text-xl font-bold mb-2">Choose a new password</h1>
+    <div className="al-bg min-h-screen flex flex-col items-center justify-center px-6" style={{ color: "var(--text)" }}>
+      <div className="al-card w-full max-w-sm p-8">
+        <h1 className="text-xl font-bold tracking-tight mb-2">Choose a new password</h1>
 
         {message ? (
           <>
@@ -52,16 +52,10 @@ function ResetPasswordInner() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Minimum 8 characters"
-              className="w-full rounded-xl border px-4 py-3 text-sm outline-none"
-              style={{ borderColor: "var(--border-strong)", background: "var(--surface)", color: "var(--text)" }}
+              className="al-input w-full px-4 py-3 text-sm"
             />
             {error && <p className="text-rose-500 text-sm">{error}</p>}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full rounded-xl px-6 py-3 text-sm font-bold text-white disabled:opacity-50"
-              style={{ background: "var(--accent-strong)" }}
-            >
+            <button type="submit" disabled={submitting} className="al-btn al-btn-primary w-full py-3 text-sm">
               {submitting ? "Saving…" : "Reset Password"}
             </button>
           </form>

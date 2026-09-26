@@ -31,17 +31,22 @@ function VerifyEmailInner() {
   }, [token]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center" style={{ background: "var(--background)", color: "var(--text)" }}>
-      {status === "loading" && (
-        <div className="h-10 w-10 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }} />
-      )}
-      {status === "success" && <p className="text-emerald-500 font-semibold text-lg">{message}</p>}
-      {status === "error" && <p className="text-rose-500 font-semibold text-lg">{message}</p>}
-      {status !== "loading" && (
-        <Link href="/" className="underline underline-offset-4 text-sm" style={{ color: "var(--accent)" }}>
-          Back to AccessLens
-        </Link>
-      )}
+    <div className="al-bg min-h-screen flex flex-col items-center justify-center px-6" style={{ color: "var(--text)" }}>
+      <div className="al-card p-10 flex flex-col items-center gap-4 text-center max-w-sm w-full">
+        {status === "loading" && (
+          <div className="relative h-12 w-12">
+            <div className="absolute inset-0 rounded-full opacity-20 blur-md" style={{ background: "linear-gradient(135deg, var(--accent-strong), var(--accent-2))" }} />
+            <div className="relative h-12 w-12 rounded-full border-[3px] border-t-transparent animate-spin" style={{ borderColor: "var(--accent)", borderTopColor: "transparent" }} />
+          </div>
+        )}
+        {status === "success" && <p className="text-emerald-500 font-semibold text-lg">{message}</p>}
+        {status === "error" && <p className="text-rose-500 font-semibold text-lg">{message}</p>}
+        {status !== "loading" && (
+          <Link href="/" className="al-btn al-btn-outline px-5 py-2.5 text-sm mt-2">
+            Back to AccessLens
+          </Link>
+        )}
+      </div>
     </div>
   );
 }

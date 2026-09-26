@@ -52,14 +52,13 @@ export default function ScreenReaderDemo({ tree }: { tree: string[] }) {
   }
 
   return (
-    <div className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+    <div className="al-card p-4">
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>Hear what a screen reader announces walking this page.</p>
         <button
           onClick={playing ? stop : play}
           disabled={tree.length === 0}
-          className="text-xs font-semibold px-3 py-1.5 rounded-full border disabled:opacity-40"
-          style={{ background: "var(--accent-soft)", borderColor: "var(--accent)", color: "var(--accent)" }}
+          className="al-btn al-btn-primary px-3 py-1.5 text-xs disabled:opacity-40"
         >
           {playing ? "Stop" : "Play"}
         </button>
